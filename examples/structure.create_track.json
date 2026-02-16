@@ -1,0 +1,8 @@
+{
+  "domain": "structure",
+  "intent": {
+    "action": "create_track",
+    "role": "drums",
+    "type": "audio"
+  }
+}

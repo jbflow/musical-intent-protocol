@@ -1,0 +1,6 @@
+{
+  "domain": "transport",
+  "intent": {
+    "action": "play"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "domain": "timbre",
+  "intent": {
+    "action": "adjust_many",
+    "target": { "role": "vocal" },
+    "changes": [
+      { "attribute": "warmth", "amount": 0.2 },
+      { "attribute": "brightness", "amount": -0.15 },
+      { "attribute": "space", "amount": 0.3 }
+    ]
+  }
+}

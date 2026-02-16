@@ -1,0 +1,23 @@
+[
+  {
+    "domain": "transport",
+    "intent": { "action": "play" }
+  },
+  {
+    "domain": "music",
+    "intent": {
+      "action": "quantize",
+      "target": { "role": "drums" },
+      "strength": 0.75
+    }
+  },
+  {
+    "domain": "timbre",
+    "intent": {
+      "action": "adjust",
+      "target": { "role": "bass" },
+      "attribute": "warmth",
+      "amount": 0.3
+    }
+  }
+]

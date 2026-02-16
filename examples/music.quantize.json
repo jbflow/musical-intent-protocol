@@ -1,0 +1,8 @@
+{
+  "domain": "music",
+  "intent": {
+    "action": "quantize",
+    "target": { "role": "drums" },
+    "strength": 0.8
+  }
+}

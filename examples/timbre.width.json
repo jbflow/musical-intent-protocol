@@ -1,0 +1,10 @@
+{
+  "domain": "timbre",
+  "intent": {
+    "action": "adjust",
+    "target": { "role": "master" },
+    "attribute": "width",
+    "amount": 0.2,
+    "intensity": 0.6
+  }
+}

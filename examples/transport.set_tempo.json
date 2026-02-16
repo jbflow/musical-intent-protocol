@@ -1,0 +1,7 @@
+{
+  "domain": "transport",
+  "intent": {
+    "action": "set_tempo",
+    "bpm": 128
+  }
+}

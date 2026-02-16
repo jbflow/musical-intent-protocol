@@ -1,0 +1,8 @@
+{
+  "domain": "harmony",
+  "intent": {
+    "action": "set_key",
+    "tonic": "D",
+    "scale": "dorian"
+  }
+}

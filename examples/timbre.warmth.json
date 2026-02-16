@@ -1,0 +1,9 @@
+{
+  "domain": "timbre",
+  "intent": {
+    "action": "adjust",
+    "target": { "role": "bass" },
+    "attribute": "warmth",
+    "amount": 0.35
+  }
+}

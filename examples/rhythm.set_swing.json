@@ -1,0 +1,8 @@
+{
+  "domain": "rhythm",
+  "intent": {
+    "action": "set_swing",
+    "amount": 0.6,
+    "target": { "role": "drums", "role_detail": "hihat" }
+  }
+}

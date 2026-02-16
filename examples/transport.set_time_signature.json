@@ -1,0 +1,8 @@
+{
+  "domain": "transport",
+  "intent": {
+    "action": "set_time_signature",
+    "numerator": 4,
+    "denominator": 4
+  }
+}
