@@ -1,4 +1,4 @@
-# Mantra Intent Protocol (MIP)
+# Musical Intent Protocol (MIP)
 
 MIP is the canonical, versioned specification for expressing **musical intent** in a DAW-agnostic way. It sits above MIDI/OSC and plugin parameters, describing *what you want* rather than *how a specific host achieves it*.
 
