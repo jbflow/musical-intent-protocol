@@ -1,0 +1,9 @@
+{
+  "domain": "music",
+  "intent": {
+    "action": "edit_notes",
+    "target": { "role": "lead", "clip_name": "Verse Lead" },
+    "selection": { "pitches": ["C#4", "E4"] },
+    "operation": { "type": "set_velocity", "velocity": 0.7 }
+  }
+}

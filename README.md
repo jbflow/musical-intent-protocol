@@ -10,16 +10,23 @@ MIP is the canonical, versioned specification for expressing **musical intent** 
 
 ## Versioning
 
-This repo starts at **v0.1**. New versions will be added in versioned folders under src.
+This repo starts at **v0.2**. New versions will be added in versioned folders under src.
 
-## Domains (v0.1)
+## Domains (v0.2)
 
 - **transport**: play/stop/record/locate/tempo/time signature/loop/metronome
-- **structure**: create/select/arm/mute/solo/load device
-- **music**: editing operations (quantize/transpose/key signature)
+- **structure**: create/select/arm/mute/solo/load device/rename/duplicate/remove
+- **music**: editing operations (quantize/transpose/key signature) plus note-level add/remove/edit
 - **harmony**: 12-TET pitch language (keys, scales, chords, progressions, ranges)
 - **rhythm**: groove/swing/subdivision/density/pattern/timing humanization
 - **performance**: trigger clip/scene (reserved for growth)
+- **analysis**: query/summarize/describe/list musical material for AI feedback
+- **pitch**: parameter series for pitch-class or pitch sets (Babbitt-inspired)
+- **duration**: parameter series for durations and rhythmic values
+- **dynamics**: parameter series for intensity/velocity curves
+- **articulation**: parameter series for performance character (legato, staccato, etc.)
+- **instrumentation**: parameter series for instrument/voice assignment
+- **time_point**: parameter series for time-point systems
 - **timbre**: perceptual adjectives (warmth, brightness, punch, width, distance, space, energy, tightness)
 
 ## Roles

@@ -1,4 +1,4 @@
-export type Version = "0.1";
+export type Version = "0.2";
 
 export type Source = "ui" | "speech" | "api" | "midi" | "osc" | "test";
 
@@ -9,6 +9,13 @@ export type Domain =
   | "harmony"
   | "rhythm"
   | "performance"
+  | "analysis"
+  | "pitch"
+  | "duration"
+  | "dynamics"
+  | "articulation"
+  | "instrumentation"
+  | "time_point"
   | "timbre";
 
 export type Role =
@@ -70,6 +77,10 @@ export interface TargetRef {
   role_detail?: string;
   track_name?: string;
   track_id?: string;
+  clip_name?: string;
+  clip_id?: string;
+  scene_name?: string;
+  scene_id?: string;
 }
 
 export type TransportIntent =
@@ -89,6 +100,9 @@ export type TransportIntent =
 
 export type StructureIntent =
   | { action: "create_track"; role: Role; type?: "audio" | "midi" }
+  | { action: "rename_track"; target: TargetRef; name: string }
+  | { action: "duplicate_track"; target: TargetRef; name?: string }
+  | { action: "remove_track"; target: TargetRef }
   | { action: "select_track"; target: TargetRef }
   | { action: "arm_track"; target: TargetRef }
   | { action: "disarm_track"; target: TargetRef }
@@ -98,10 +112,50 @@ export type StructureIntent =
   | { action: "unsolo"; target: TargetRef }
   | { action: "load_device"; target: TargetRef; device: string; kind: "instrument" | "effect" };
 
+export interface NoteEvent {
+  note_id?: string;
+  pitch: string;
+  start_beats: number;
+  duration_beats: number;
+  velocity?: number;
+  channel?: number;
+}
+
+export interface NoteSelection {
+  note_ids?: string[];
+  pitches?: string[];
+  pitch_classes?: PitchClass[];
+  time_range?: {
+    start_beats: number;
+    end_beats: number;
+  };
+  velocity_range?: {
+    min: number;
+    max: number;
+  };
+}
+
+export type NoteOperation =
+  | { type: "set_velocity"; velocity: number }
+  | { type: "set_duration"; duration_beats: number }
+  | { type: "set_start"; start_beats: number }
+  | { type: "set_pitch"; pitch: string }
+  | { type: "transpose"; semitones: number }
+  | { type: "quantize"; strength: number }
+  | { type: "humanize"; amount: number };
+
 export type MusicIntent =
   | { action: "quantize"; target: TargetRef; strength: number }
   | { action: "transpose"; target: TargetRef; semitones: number }
-  | { action: "set_key_signature"; key: string; scale: "major" | "minor" };
+  | { action: "set_key_signature"; key: string; scale: "major" | "minor" }
+  | { action: "add_notes"; target: TargetRef; notes: NoteEvent[] }
+  | { action: "remove_notes"; target: TargetRef; selection: NoteSelection }
+  | {
+      action: "edit_notes";
+      target: TargetRef;
+      selection: NoteSelection;
+      operation: NoteOperation;
+    };
 
 export type PitchClass =
   | "C"
@@ -205,6 +259,44 @@ export type TimbreIntent =
       changes: TimbreChange[];
     };
 
+export type ParameterValue = string | number;
+
+export type SeriesTransformOperation =
+  | "invert"
+  | "retrograde"
+  | "rotate"
+  | "shuffle"
+  | "stretch"
+  | "compress";
+
+export type ParameterSeriesIntent =
+  | { action: "set_value"; value: ParameterValue; target?: TargetRef }
+  | { action: "set_series"; series: ParameterValue[]; target?: TargetRef }
+  | {
+      action: "transform_series";
+      operation: SeriesTransformOperation;
+      amount?: number;
+      target?: TargetRef;
+    }
+  | { action: "map"; source: string; destination: string; target?: TargetRef };
+
+export type PitchIntent = ParameterSeriesIntent;
+export type DurationIntent = ParameterSeriesIntent;
+export type DynamicsIntent = ParameterSeriesIntent;
+export type ArticulationIntent = ParameterSeriesIntent;
+export type InstrumentationIntent = ParameterSeriesIntent;
+export type TimePointIntent = ParameterSeriesIntent;
+
+export type AnalysisIntent =
+  | { action: "summarize"; target?: TargetRef; detail?: "brief" | "detailed" }
+  | { action: "describe"; target?: TargetRef; focus?: string }
+  | { action: "query"; question: string; target?: TargetRef; format?: "text" | "json" }
+  | {
+      action: "list";
+      kind: "tracks" | "clips" | "scenes" | "devices" | "notes" | "automation";
+      target?: TargetRef;
+    };
+
 export type DomainPayloadMap = {
   transport: TransportIntent;
   structure: StructureIntent;
@@ -212,6 +304,13 @@ export type DomainPayloadMap = {
   harmony: HarmonyIntent;
   rhythm: RhythmIntent;
   performance: PerformanceIntent;
+  analysis: AnalysisIntent;
+  pitch: PitchIntent;
+  duration: DurationIntent;
+  dynamics: DynamicsIntent;
+  articulation: ArticulationIntent;
+  instrumentation: InstrumentationIntent;
+  time_point: TimePointIntent;
   timbre: TimbreIntent;
 };
 
@@ -224,6 +323,13 @@ export type Intent =
   | { domain: "harmony"; intent: HarmonyIntent }
   | { domain: "rhythm"; intent: RhythmIntent }
   | { domain: "performance"; intent: PerformanceIntent }
+  | { domain: "analysis"; intent: AnalysisIntent }
+  | { domain: "pitch"; intent: PitchIntent }
+  | { domain: "duration"; intent: DurationIntent }
+  | { domain: "dynamics"; intent: DynamicsIntent }
+  | { domain: "articulation"; intent: ArticulationIntent }
+  | { domain: "instrumentation"; intent: InstrumentationIntent }
+  | { domain: "time_point"; intent: TimePointIntent }
   | { domain: "timbre"; intent: TimbreIntent };
 
 export type Envelope<D extends Domain = Domain> = {
@@ -267,7 +373,7 @@ export const makeEnvelope = <D extends Domain>(input: {
   timestamp?: number;
   version?: Version;
 }): Envelope<D> => ({
-  version: input.version ?? "0.1",
+  version: input.version ?? "0.2",
   id: input.id ?? generateId(),
   timestamp: input.timestamp ?? Date.now(),
   source: input.source,

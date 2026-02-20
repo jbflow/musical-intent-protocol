@@ -1,0 +1,8 @@
+{
+  "domain": "instrumentation",
+  "intent": {
+    "action": "set_series",
+    "series": ["piano", "synth", "strings"],
+    "target": { "role": "pad" }
+  }
+}

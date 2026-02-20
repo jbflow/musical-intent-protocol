@@ -1,0 +1,8 @@
+{
+  "domain": "time_point",
+  "intent": {
+    "action": "set_series",
+    "series": [0, 1.5, 3, 4.5],
+    "target": { "role": "lead" }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "domain": "structure",
+  "intent": {
+    "action": "rename_track",
+    "target": { "track_name": "Drums" },
+    "name": "Beats"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "domain": "analysis",
+  "intent": {
+    "action": "query",
+    "question": "What is the harmonic center of the chorus?",
+    "target": { "scene_name": "Chorus" },
+    "format": "text"
+  }
+}

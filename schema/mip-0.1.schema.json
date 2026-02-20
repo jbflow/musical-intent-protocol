@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mantra.dev/mip/schema/mip-0.1.schema.json",
-  "title": "Mantra Intent Protocol v0.1",
+  "$id": "https://mantra.dev/mip/schema/mip-0.2.schema.json",
+  "title": "Mantra Intent Protocol v0.2",
   "description": "Versioned, DAW-agnostic representation of musical intent.",
   "oneOf": [
     { "$ref": "#/definitions/Intent" },
@@ -12,7 +12,7 @@
   "definitions": {
     "Version": {
       "type": "string",
-      "const": "0.1"
+      "const": "0.2"
     },
     "Source": {
       "type": "string",
@@ -20,7 +20,22 @@
     },
     "Domain": {
       "type": "string",
-      "enum": ["transport", "structure", "music", "harmony", "rhythm", "performance", "timbre"]
+      "enum": [
+        "transport",
+        "structure",
+        "music",
+        "harmony",
+        "rhythm",
+        "performance",
+        "analysis",
+        "pitch",
+        "duration",
+        "dynamics",
+        "articulation",
+        "instrumentation",
+        "time_point",
+        "timbre"
+      ]
     },
     "Role": {
       "type": "string",
@@ -79,7 +94,11 @@
         "role_category": { "$ref": "#/definitions/RoleCategory" },
         "role_detail": { "type": "string" },
         "track_name": { "type": "string" },
-        "track_id": { "type": "string" }
+        "track_id": { "type": "string" },
+        "clip_name": { "type": "string" },
+        "clip_id": { "type": "string" },
+        "scene_name": { "type": "string" },
+        "scene_id": { "type": "string" }
       },
       "additionalProperties": false
     },
@@ -153,6 +172,35 @@
             "type": { "type": "string", "enum": ["audio", "midi"] }
           },
           "required": ["action", "role"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "rename_track" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "name": { "type": "string" }
+          },
+          "required": ["action", "target", "name"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "duplicate_track" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "name": { "type": "string" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "remove_track" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
           "additionalProperties": false
         },
         {
@@ -261,6 +309,148 @@
             "scale": { "type": "string", "enum": ["major", "minor"] }
           },
           "required": ["action", "key", "scale"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "add_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "notes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/NoteEvent" }
+            }
+          },
+          "required": ["action", "target", "notes"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "remove_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "selection": { "$ref": "#/definitions/NoteSelection" }
+          },
+          "required": ["action", "target", "selection"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "edit_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "selection": { "$ref": "#/definitions/NoteSelection" },
+            "operation": { "$ref": "#/definitions/NoteOperation" }
+          },
+          "required": ["action", "target", "selection", "operation"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "NoteEvent": {
+      "type": "object",
+      "properties": {
+        "note_id": { "type": "string" },
+        "pitch": { "type": "string" },
+        "start_beats": { "type": "number" },
+        "duration_beats": { "type": "number", "exclusiveMinimum": 0 },
+        "velocity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "channel": { "type": "integer", "minimum": 1, "maximum": 16 }
+      },
+      "required": ["pitch", "start_beats", "duration_beats"],
+      "additionalProperties": false
+    },
+    "NoteSelection": {
+      "type": "object",
+      "properties": {
+        "note_ids": { "type": "array", "items": { "type": "string" } },
+        "pitches": { "type": "array", "items": { "type": "string" } },
+        "pitch_classes": { "type": "array", "items": { "$ref": "#/definitions/PitchClass" } },
+        "time_range": {
+          "type": "object",
+          "properties": {
+            "start_beats": { "type": "number" },
+            "end_beats": { "type": "number" }
+          },
+          "required": ["start_beats", "end_beats"],
+          "additionalProperties": false
+        },
+        "velocity_range": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["min", "max"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "NoteOperation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_velocity" },
+            "velocity": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "velocity"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_duration" },
+            "duration_beats": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "required": ["type", "duration_beats"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_start" },
+            "start_beats": { "type": "number" }
+          },
+          "required": ["type", "start_beats"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_pitch" },
+            "pitch": { "type": "string" }
+          },
+          "required": ["type", "pitch"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "transpose" },
+            "semitones": { "type": "integer" }
+          },
+          "required": ["type", "semitones"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "quantize" },
+            "strength": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "strength"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "humanize" },
+            "amount": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "amount"],
           "additionalProperties": false
         }
       ]
@@ -479,6 +669,113 @@
         }
       ]
     },
+    "ParameterSeriesIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_value" },
+            "value": { "oneOf": [{ "type": "string" }, { "type": "number" }] },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "value"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_series" },
+            "series": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "oneOf": [{ "type": "string" }, { "type": "number" }] }
+            },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "series"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "transform_series" },
+            "operation": {
+              "type": "string",
+              "enum": ["invert", "retrograde", "rotate", "shuffle", "stretch", "compress"]
+            },
+            "amount": { "type": "number" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "operation"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "map" },
+            "source": { "type": "string" },
+            "destination": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "source", "destination"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PitchIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "DurationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "DynamicsIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "ArticulationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "InstrumentationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "TimePointIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "AnalysisIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "summarize" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "detail": { "type": "string", "enum": ["brief", "detailed"] }
+          },
+          "required": ["action"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "describe" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "focus": { "type": "string" }
+          },
+          "required": ["action"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "query" },
+            "question": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "format": { "type": "string", "enum": ["text", "json"] }
+          },
+          "required": ["action", "question"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "list" },
+            "kind": {
+              "type": "string",
+              "enum": ["tracks", "clips", "scenes", "devices", "notes", "automation"]
+            },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "kind"],
+          "additionalProperties": false
+        }
+      ]
+    },
     "Intent": {
       "oneOf": [
         {
@@ -531,6 +828,69 @@
           "properties": {
             "domain": { "const": "performance" },
             "intent": { "$ref": "#/definitions/PerformanceIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "analysis" },
+            "intent": { "$ref": "#/definitions/AnalysisIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "pitch" },
+            "intent": { "$ref": "#/definitions/PitchIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "duration" },
+            "intent": { "$ref": "#/definitions/DurationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "dynamics" },
+            "intent": { "$ref": "#/definitions/DynamicsIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "articulation" },
+            "intent": { "$ref": "#/definitions/ArticulationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "instrumentation" },
+            "intent": { "$ref": "#/definitions/InstrumentationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "time_point" },
+            "intent": { "$ref": "#/definitions/TimePointIntent" }
           },
           "required": ["domain", "intent"],
           "additionalProperties": false
@@ -622,6 +982,97 @@
             "source": { "$ref": "#/definitions/Source" },
             "domain": { "const": "performance" },
             "intent": { "$ref": "#/definitions/PerformanceIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "analysis" },
+            "intent": { "$ref": "#/definitions/AnalysisIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "pitch" },
+            "intent": { "$ref": "#/definitions/PitchIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "duration" },
+            "intent": { "$ref": "#/definitions/DurationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "dynamics" },
+            "intent": { "$ref": "#/definitions/DynamicsIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "articulation" },
+            "intent": { "$ref": "#/definitions/ArticulationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "instrumentation" },
+            "intent": { "$ref": "#/definitions/InstrumentationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "time_point" },
+            "intent": { "$ref": "#/definitions/TimePointIntent" }
           },
           "required": ["version", "id", "timestamp", "source", "domain", "intent"],
           "additionalProperties": false

@@ -1,0 +1,8 @@
+{
+  "domain": "duration",
+  "intent": {
+    "action": "set_series",
+    "series": [1, 0.5, 0.5, 2],
+    "target": { "role": "pad" }
+  }
+}

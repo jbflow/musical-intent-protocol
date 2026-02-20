@@ -1,0 +1,8 @@
+{
+  "domain": "structure",
+  "intent": {
+    "action": "duplicate_track",
+    "target": { "role": "bass" },
+    "name": "Bass Double"
+  }
+}

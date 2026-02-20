@@ -1,0 +1,7 @@
+{
+  "domain": "structure",
+  "intent": {
+    "action": "remove_track",
+    "target": { "track_name": "Scratch Pad" }
+  }
+}

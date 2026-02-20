@@ -76,6 +76,10 @@ export const TargetRefSchema: z.ZodType<TargetRef> = z
     role_detail: z.string().optional(),
     track_name: z.string().optional(),
     track_id: z.string().optional(),
+    clip_name: z.string().optional(),
+    clip_id: z.string().optional(),
+    scene_name: z.string().optional(),
+    scene_id: z.string().optional(),
   })
   .strict();
 
@@ -152,6 +156,26 @@ const StructureCreateTrackSchema = z
     type: z.enum(["audio", "midi"]).optional(),
   })
   .strict();
+const StructureRenameTrackSchema = z
+  .object({
+    action: z.literal("rename_track"),
+    target: TargetRefSchema,
+    name: z.string(),
+  })
+  .strict();
+const StructureDuplicateTrackSchema = z
+  .object({
+    action: z.literal("duplicate_track"),
+    target: TargetRefSchema,
+    name: z.string().optional(),
+  })
+  .strict();
+const StructureRemoveTrackSchema = z
+  .object({
+    action: z.literal("remove_track"),
+    target: TargetRefSchema,
+  })
+  .strict();
 const StructureSelectTrackSchema = z
   .object({ action: z.literal("select_track"), target: TargetRefSchema })
   .strict();
@@ -184,6 +208,9 @@ const StructureLoadDeviceSchema = z
 
 export const StructureIntentSchema = z.union([
   StructureCreateTrackSchema,
+  StructureRenameTrackSchema,
+  StructureDuplicateTrackSchema,
+  StructureRemoveTrackSchema,
   StructureSelectTrackSchema,
   StructureArmTrackSchema,
   StructureDisarmTrackSchema,
@@ -213,6 +240,31 @@ const MusicSetKeySignatureSchema = z
     action: z.literal("set_key_signature"),
     key: z.string(),
     scale: z.enum(["major", "minor"]),
+  })
+  .strict();
+
+const MusicAddNotesSchema = z
+  .object({
+    action: z.literal("add_notes"),
+    target: TargetRefSchema,
+    notes: z.array(NoteEventSchema).min(1),
+  })
+  .strict();
+
+const MusicRemoveNotesSchema = z
+  .object({
+    action: z.literal("remove_notes"),
+    target: TargetRefSchema,
+    selection: NoteSelectionSchema,
+  })
+  .strict();
+
+const MusicEditNotesSchema = z
+  .object({
+    action: z.literal("edit_notes"),
+    target: TargetRefSchema,
+    selection: NoteSelectionSchema,
+    operation: NoteOperationSchema,
   })
   .strict();
 
@@ -254,10 +306,56 @@ const scaleTypeValues = [
   "diminished",
 ] as const;
 
+const NoteEventSchema = z
+  .object({
+    note_id: z.string().optional(),
+    pitch: z.string(),
+    start_beats: z.number(),
+    duration_beats: z.number().positive(),
+    velocity: z.number().min(0).max(1).optional(),
+    channel: z.number().int().min(1).max(16).optional(),
+  })
+  .strict();
+
+const NoteSelectionSchema = z
+  .object({
+    note_ids: z.array(z.string()).optional(),
+    pitches: z.array(z.string()).optional(),
+    pitch_classes: z.enum(pitchClassValues).array().optional(),
+    time_range: z
+      .object({
+        start_beats: z.number(),
+        end_beats: z.number(),
+      })
+      .strict()
+      .optional(),
+    velocity_range: z
+      .object({
+        min: z.number().min(0).max(1),
+        max: z.number().min(0).max(1),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+const NoteOperationSchema = z.union([
+  z.object({ type: z.literal("set_velocity"), velocity: z.number().min(0).max(1) }).strict(),
+  z.object({ type: z.literal("set_duration"), duration_beats: z.number().positive() }).strict(),
+  z.object({ type: z.literal("set_start"), start_beats: z.number() }).strict(),
+  z.object({ type: z.literal("set_pitch"), pitch: z.string() }).strict(),
+  z.object({ type: z.literal("transpose"), semitones: z.number().int() }).strict(),
+  z.object({ type: z.literal("quantize"), strength: z.number().min(0).max(1) }).strict(),
+  z.object({ type: z.literal("humanize"), amount: z.number().min(0).max(1) }).strict(),
+]);
+
 export const MusicIntentSchema = z.union([
   MusicQuantizeSchema,
   MusicTransposeSchema,
   MusicSetKeySignatureSchema,
+  MusicAddNotesSchema,
+  MusicRemoveNotesSchema,
+  MusicEditNotesSchema,
 ]);
 
 const HarmonySetKeySchema = z
@@ -409,6 +507,96 @@ export const TimbreIntentSchema = z.union([
   TimbreAdjustManySchema,
 ]);
 
+const parameterValueSchema = z.union([z.string(), z.number()]);
+
+const ParameterSetValueSchema = z
+  .object({
+    action: z.literal("set_value"),
+    value: parameterValueSchema,
+    target: TargetRefSchema.optional(),
+  })
+  .strict();
+
+const ParameterSetSeriesSchema = z
+  .object({
+    action: z.literal("set_series"),
+    series: z.array(parameterValueSchema).min(1),
+    target: TargetRefSchema.optional(),
+  })
+  .strict();
+
+const ParameterTransformSeriesSchema = z
+  .object({
+    action: z.literal("transform_series"),
+    operation: z.enum(["invert", "retrograde", "rotate", "shuffle", "stretch", "compress"]),
+    amount: z.number().optional(),
+    target: TargetRefSchema.optional(),
+  })
+  .strict();
+
+const ParameterMapSchema = z
+  .object({
+    action: z.literal("map"),
+    source: z.string(),
+    destination: z.string(),
+    target: TargetRefSchema.optional(),
+  })
+  .strict();
+
+export const ParameterSeriesIntentSchema = z.union([
+  ParameterSetValueSchema,
+  ParameterSetSeriesSchema,
+  ParameterTransformSeriesSchema,
+  ParameterMapSchema,
+]);
+
+export const PitchIntentSchema = ParameterSeriesIntentSchema;
+export const DurationIntentSchema = ParameterSeriesIntentSchema;
+export const DynamicsIntentSchema = ParameterSeriesIntentSchema;
+export const ArticulationIntentSchema = ParameterSeriesIntentSchema;
+export const InstrumentationIntentSchema = ParameterSeriesIntentSchema;
+export const TimePointIntentSchema = ParameterSeriesIntentSchema;
+
+const AnalysisSummarizeSchema = z
+  .object({
+    action: z.literal("summarize"),
+    target: TargetRefSchema.optional(),
+    detail: z.enum(["brief", "detailed"]).optional(),
+  })
+  .strict();
+
+const AnalysisDescribeSchema = z
+  .object({
+    action: z.literal("describe"),
+    target: TargetRefSchema.optional(),
+    focus: z.string().optional(),
+  })
+  .strict();
+
+const AnalysisQuerySchema = z
+  .object({
+    action: z.literal("query"),
+    question: z.string(),
+    target: TargetRefSchema.optional(),
+    format: z.enum(["text", "json"]).optional(),
+  })
+  .strict();
+
+const AnalysisListSchema = z
+  .object({
+    action: z.literal("list"),
+    kind: z.enum(["tracks", "clips", "scenes", "devices", "notes", "automation"]),
+    target: TargetRefSchema.optional(),
+  })
+  .strict();
+
+export const AnalysisIntentSchema = z.union([
+  AnalysisSummarizeSchema,
+  AnalysisDescribeSchema,
+  AnalysisQuerySchema,
+  AnalysisListSchema,
+]);
+
 export const IntentSchema = z.discriminatedUnion("domain", [
   z.object({ domain: z.literal("transport"), intent: TransportIntentSchema }).strict(),
   z.object({ domain: z.literal("structure"), intent: StructureIntentSchema }).strict(),
@@ -416,6 +604,13 @@ export const IntentSchema = z.discriminatedUnion("domain", [
   z.object({ domain: z.literal("harmony"), intent: HarmonyIntentSchema }).strict(),
   z.object({ domain: z.literal("rhythm"), intent: RhythmIntentSchema }).strict(),
   z.object({ domain: z.literal("performance"), intent: PerformanceIntentSchema }).strict(),
+  z.object({ domain: z.literal("analysis"), intent: AnalysisIntentSchema }).strict(),
+  z.object({ domain: z.literal("pitch"), intent: PitchIntentSchema }).strict(),
+  z.object({ domain: z.literal("duration"), intent: DurationIntentSchema }).strict(),
+  z.object({ domain: z.literal("dynamics"), intent: DynamicsIntentSchema }).strict(),
+  z.object({ domain: z.literal("articulation"), intent: ArticulationIntentSchema }).strict(),
+  z.object({ domain: z.literal("instrumentation"), intent: InstrumentationIntentSchema }).strict(),
+  z.object({ domain: z.literal("time_point"), intent: TimePointIntentSchema }).strict(),
   z.object({ domain: z.literal("timbre"), intent: TimbreIntentSchema }).strict(),
 ]);
 
@@ -427,7 +622,7 @@ export const IntentOrArraySchema = z.union([
 export const EnvelopeSchema = z.discriminatedUnion("domain", [
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -437,7 +632,7 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -447,7 +642,7 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -457,7 +652,7 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -467,7 +662,7 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -477,7 +672,7 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),
@@ -487,7 +682,77 @@ export const EnvelopeSchema = z.discriminatedUnion("domain", [
     .strict(),
   z
     .object({
-      version: z.literal("0.1"),
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("analysis"),
+      intent: AnalysisIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("pitch"),
+      intent: PitchIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("duration"),
+      intent: DurationIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("dynamics"),
+      intent: DynamicsIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("articulation"),
+      intent: ArticulationIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("instrumentation"),
+      intent: InstrumentationIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
+      id: z.string(),
+      timestamp: z.number(),
+      source: z.enum(sourceValues),
+      domain: z.literal("time_point"),
+      intent: TimePointIntentSchema,
+    })
+    .strict(),
+  z
+    .object({
+      version: z.literal("0.2"),
       id: z.string(),
       timestamp: z.number(),
       source: z.enum(sourceValues),

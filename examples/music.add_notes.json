@@ -1,0 +1,12 @@
+{
+  "domain": "music",
+  "intent": {
+    "action": "add_notes",
+    "target": { "role": "lead", "clip_name": "Verse Lead" },
+    "notes": [
+      { "pitch": "C#4", "start_beats": 0, "duration_beats": 1, "velocity": 0.8 },
+      { "pitch": "E4", "start_beats": 1, "duration_beats": 1, "velocity": 0.78 },
+      { "pitch": "G#4", "start_beats": 2, "duration_beats": 2, "velocity": 0.82 }
+    ]
+  }
+}

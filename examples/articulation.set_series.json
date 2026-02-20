@@ -1,0 +1,8 @@
+{
+  "domain": "articulation",
+  "intent": {
+    "action": "set_series",
+    "series": ["legato", "staccato", "tenuto"],
+    "target": { "role": "strings" }
+  }
+}
