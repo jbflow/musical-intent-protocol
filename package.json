@@ -1,7 +1,7 @@
 {
-  "name": "mantra-intent-protocol",
-  "version": "0.1.0",
-  "description": "Canonical, versioned specification for the Mantra Intent Protocol (MIP).",
+  "name": "musical-intent-protocol",
+  "version": "0.2.0",
+  "description": "Canonical, versioned specification for the Musical Intent Protocol (MIP).",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist",
+    "prepare": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",

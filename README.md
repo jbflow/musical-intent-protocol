@@ -45,7 +45,7 @@ A common envelope is recommended for engine use:
 
 ```json
 {
-  "version": "0.1",
+  "version": "0.2",
   "id": "uuid",
   "timestamp": 1739579325000,
   "source": "ui",
@@ -146,7 +146,7 @@ Rhythm intents describe groove and timing behavior:
 
 ## Examples
 
-See the examples folder for JSON files that validate against v0.1.
+See the examples folder for JSON files that validate against v0.2.
 
 ## Build
 

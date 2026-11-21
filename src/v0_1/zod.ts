@@ -243,31 +243,6 @@ const MusicSetKeySignatureSchema = z
   })
   .strict();
 
-const MusicAddNotesSchema = z
-  .object({
-    action: z.literal("add_notes"),
-    target: TargetRefSchema,
-    notes: z.array(NoteEventSchema).min(1),
-  })
-  .strict();
-
-const MusicRemoveNotesSchema = z
-  .object({
-    action: z.literal("remove_notes"),
-    target: TargetRefSchema,
-    selection: NoteSelectionSchema,
-  })
-  .strict();
-
-const MusicEditNotesSchema = z
-  .object({
-    action: z.literal("edit_notes"),
-    target: TargetRefSchema,
-    selection: NoteSelectionSchema,
-    operation: NoteOperationSchema,
-  })
-  .strict();
-
 const pitchClassValues = [
   "C",
   "C#",
@@ -348,6 +323,31 @@ const NoteOperationSchema = z.union([
   z.object({ type: z.literal("quantize"), strength: z.number().min(0).max(1) }).strict(),
   z.object({ type: z.literal("humanize"), amount: z.number().min(0).max(1) }).strict(),
 ]);
+
+const MusicAddNotesSchema = z
+  .object({
+    action: z.literal("add_notes"),
+    target: TargetRefSchema,
+    notes: z.array(NoteEventSchema).min(1),
+  })
+  .strict();
+
+const MusicRemoveNotesSchema = z
+  .object({
+    action: z.literal("remove_notes"),
+    target: TargetRefSchema,
+    selection: NoteSelectionSchema,
+  })
+  .strict();
+
+const MusicEditNotesSchema = z
+  .object({
+    action: z.literal("edit_notes"),
+    target: TargetRefSchema,
+    selection: NoteSelectionSchema,
+    operation: NoteOperationSchema,
+  })
+  .strict();
 
 export const MusicIntentSchema = z.union([
   MusicQuantizeSchema,

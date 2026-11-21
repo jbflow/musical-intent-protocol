@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mantra.dev/mip/schema/mip-0.2.schema.json",
-  "title": "Mantra Intent Protocol v0.2",
+  "title": "Musical Intent Protocol v0.2",
   "description": "Versioned, DAW-agnostic representation of musical intent.",
   "oneOf": [
     { "$ref": "#/definitions/Intent" },
