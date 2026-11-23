@@ -7,7 +7,7 @@ COPY src ./src
 COPY schema ./schema
 COPY tsconfig.json ./
 
-ENV NODE_ENV=production
+RUN npm ci
 
 EXPOSE 3000
 
