@@ -7,8 +7,6 @@ COPY src ./src
 COPY schema ./schema
 COPY tsconfig.json ./
 
-# For local development, node_modules come from docker-compose volume mount
-# This just sets up the app structure
 ENV NODE_ENV=production
 
 EXPOSE 3000
