@@ -3,10 +3,13 @@ FROM node:26-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+COPY src ./src
+COPY schema ./schema
+COPY tsconfig.json ./
 
-COPY . .
-RUN npm run build
+# For local development, node_modules come from docker-compose volume mount
+# This just sets up the app structure
+ENV NODE_ENV=production
 
 EXPOSE 3000
 
