@@ -1,6 +1,6 @@
 {
   "name": "musical-intent-protocol",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Canonical, versioned specification for the Musical Intent Protocol (MIP).",
   "license": "MIT",
   "type": "module",
@@ -21,15 +21,27 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./v0_1": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "./v0_3": {
+      "types": "./dist/v0_3/index.d.ts",
+      "import": "./dist/v0_3/index.js",
+      "require": "./dist/v0_3/index.cjs"
     },
-    "./schema/mip-0.1.schema.json": "./schema/mip-0.1.schema.json"
+    "./v0_2": {
+      "types": "./dist/v0_2/index.d.ts",
+      "import": "./dist/v0_2/index.js",
+      "require": "./dist/v0_2/index.cjs"
+    },
+    "./v0_1": {
+      "types": "./dist/v0_2/index.d.ts",
+      "import": "./dist/v0_2/index.js",
+      "require": "./dist/v0_2/index.cjs"
+    },
+    "./schema/mip-0.1.schema.json": "./schema/mip-0.1.schema.json",
+    "./schema/mip-0.2.schema.json": "./schema/mip-0.2.schema.json",
+    "./schema/mip-0.3.schema.json": "./schema/mip-0.3.schema.json"
   },
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist",
+    "build": "tsup src/index.ts src/v0_2/index.ts src/v0_3/index.ts --dts --format esm,cjs --out-dir dist",
     "prepare": "npm run build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

@@ -1,0 +1,1179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mantra.dev/mip/schema/mip-0.3.schema.json",
+  "title": "Musical Intent Protocol v0.3",
+  "description": "Versioned, DAW-agnostic representation of musical intent.",
+  "oneOf": [
+    { "$ref": "#/definitions/Intent" },
+    { "type": "array", "items": { "$ref": "#/definitions/Intent" } },
+    { "$ref": "#/definitions/Envelope" },
+    { "type": "array", "items": { "$ref": "#/definitions/Envelope" } }
+  ],
+  "definitions": {
+    "Version": {
+      "type": "string",
+      "const": "0.3"
+    },
+    "Source": {
+      "type": "string",
+      "enum": ["ui", "speech", "api", "midi", "osc", "test"]
+    },
+    "Domain": {
+      "type": "string",
+      "enum": [
+        "transport",
+        "structure",
+        "music",
+        "harmony",
+        "rhythm",
+        "performance",
+        "analysis",
+        "pitch",
+        "duration",
+        "dynamics",
+        "articulation",
+        "instrumentation",
+        "time_point",
+        "timbre",
+        "parameters"
+      ]
+    },
+    "Role": {
+      "type": "string",
+      "enum": [
+        "drums",
+        "percussion",
+        "kick",
+        "snare",
+        "clap",
+        "hihat",
+        "toms",
+        "cymbals",
+        "bass",
+        "subbass",
+        "lead",
+        "pad",
+        "arp",
+        "pluck",
+        "keys",
+        "piano",
+        "organ",
+        "synth",
+        "guitar",
+        "acoustic_guitar",
+        "electric_guitar",
+        "strings",
+        "brass",
+        "woodwinds",
+        "orchestra",
+        "vocal",
+        "lead_vocal",
+        "backing_vocal",
+        "choir",
+        "fx",
+        "riser",
+        "impact",
+        "sweep",
+        "texture",
+        "atmosphere",
+        "ambience",
+        "noise",
+        "master",
+        "group",
+        "bus",
+        "reference"
+      ]
+    },
+    "RoleCategory": {
+      "type": "string",
+      "enum": ["rhythm", "bass", "harmony", "melody", "vocal", "texture", "fx", "utility"]
+    },
+    "TargetRef": {
+      "type": "object",
+      "properties": {
+        "role": { "$ref": "#/definitions/Role" },
+        "role_category": { "$ref": "#/definitions/RoleCategory" },
+        "role_detail": { "type": "string" },
+        "track_name": { "type": "string" },
+        "track_id": { "type": "string" },
+        "clip_name": { "type": "string" },
+        "clip_id": { "type": "string" },
+        "scene_name": { "type": "string" },
+        "scene_id": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TransportIntent": {
+      "oneOf": [
+        { "type": "object", "properties": { "action": { "const": "play" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "stop" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "record" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "toggle_record" } }, "required": ["action"], "additionalProperties": false },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "locate" },
+            "bars": { "type": "number" },
+            "beats": { "type": "number" }
+          },
+          "required": ["action", "bars"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "locate" },
+            "timecode": { "type": "string" }
+          },
+          "required": ["action", "timecode"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_tempo" },
+            "bpm": { "type": "number" }
+          },
+          "required": ["action", "bpm"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_time_signature" },
+            "numerator": { "type": "integer", "minimum": 1 },
+            "denominator": { "type": "integer", "minimum": 1 }
+          },
+          "required": ["action", "numerator", "denominator"],
+          "additionalProperties": false
+        },
+        { "type": "object", "properties": { "action": { "const": "metronome_on" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "metronome_off" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "loop_on" } }, "required": ["action"], "additionalProperties": false },
+        { "type": "object", "properties": { "action": { "const": "loop_off" } }, "required": ["action"], "additionalProperties": false },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_loop" },
+            "startBars": { "type": "number" },
+            "lengthBars": { "type": "number" }
+          },
+          "required": ["action", "startBars", "lengthBars"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StructureIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "create_track" },
+            "role": { "$ref": "#/definitions/Role" },
+            "type": { "type": "string", "enum": ["audio", "midi"] }
+          },
+          "required": ["action", "role"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "rename_track" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "name": { "type": "string" }
+          },
+          "required": ["action", "target", "name"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "duplicate_track" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "name": { "type": "string" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "remove_track" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "select_track" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "arm_track" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "disarm_track" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "mute" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "unmute" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "solo" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "unsolo" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "load_device" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "device": { "type": "string" },
+            "kind": { "type": "string", "enum": ["instrument", "effect"] }
+          },
+          "required": ["action", "target", "device", "kind"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MusicIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "quantize" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "strength": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["action", "target", "strength"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "transpose" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "semitones": { "type": "integer" }
+          },
+          "required": ["action", "target", "semitones"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_key_signature" },
+            "key": { "type": "string" },
+            "scale": { "type": "string", "enum": ["major", "minor"] }
+          },
+          "required": ["action", "key", "scale"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "add_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "notes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/NoteEvent" }
+            }
+          },
+          "required": ["action", "target", "notes"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "remove_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "selection": { "$ref": "#/definitions/NoteSelection" }
+          },
+          "required": ["action", "target", "selection"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "edit_notes" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "selection": { "$ref": "#/definitions/NoteSelection" },
+            "operation": { "$ref": "#/definitions/NoteOperation" }
+          },
+          "required": ["action", "target", "selection", "operation"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "NoteEvent": {
+      "type": "object",
+      "properties": {
+        "note_id": { "type": "string" },
+        "pitch": { "type": "string" },
+        "start_beats": { "type": "number" },
+        "duration_beats": { "type": "number", "exclusiveMinimum": 0 },
+        "velocity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "channel": { "type": "integer", "minimum": 1, "maximum": 16 }
+      },
+      "required": ["pitch", "start_beats", "duration_beats"],
+      "additionalProperties": false
+    },
+    "NoteSelection": {
+      "type": "object",
+      "properties": {
+        "note_ids": { "type": "array", "items": { "type": "string" } },
+        "pitches": { "type": "array", "items": { "type": "string" } },
+        "pitch_classes": { "type": "array", "items": { "$ref": "#/definitions/PitchClass" } },
+        "time_range": {
+          "type": "object",
+          "properties": {
+            "start_beats": { "type": "number" },
+            "end_beats": { "type": "number" }
+          },
+          "required": ["start_beats", "end_beats"],
+          "additionalProperties": false
+        },
+        "velocity_range": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["min", "max"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "NoteOperation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_velocity" },
+            "velocity": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "velocity"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_duration" },
+            "duration_beats": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "required": ["type", "duration_beats"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_start" },
+            "start_beats": { "type": "number" }
+          },
+          "required": ["type", "start_beats"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set_pitch" },
+            "pitch": { "type": "string" }
+          },
+          "required": ["type", "pitch"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "transpose" },
+            "semitones": { "type": "integer" }
+          },
+          "required": ["type", "semitones"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "quantize" },
+            "strength": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "strength"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "humanize" },
+            "amount": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["type", "amount"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PitchClass": {
+      "type": "string",
+      "enum": ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"]
+    },
+    "ScaleType": {
+      "type": "string",
+      "enum": [
+        "major",
+        "minor",
+        "harmonic_minor",
+        "melodic_minor",
+        "dorian",
+        "phrygian",
+        "lydian",
+        "mixolydian",
+        "locrian",
+        "pentatonic_major",
+        "pentatonic_minor",
+        "blues",
+        "chromatic",
+        "whole_tone",
+        "diminished"
+      ]
+    },
+    "HarmonyIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_key" },
+            "tonic": { "$ref": "#/definitions/PitchClass" },
+            "scale": { "$ref": "#/definitions/ScaleType" }
+          },
+          "required": ["action", "tonic", "scale"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_chord" },
+            "chord": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "chord"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_chord_progression" },
+            "progression": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "notation": { "type": "string", "enum": ["roman", "symbols"] },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "progression"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_pitch_range" },
+            "low": { "type": "string" },
+            "high": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "low", "high"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "RhythmIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_groove" },
+            "groove": { "type": "string", "enum": ["straight", "swing", "shuffle", "triplet", "dotted"] },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "groove"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_swing" },
+            "amount": { "type": "number", "minimum": 0, "maximum": 1 },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "amount"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_subdivision" },
+            "subdivision": {
+              "type": "string",
+              "enum": ["1/1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/8T", "1/16T"]
+            },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "subdivision"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_rhythm_pattern" },
+            "pattern": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "pattern"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_density" },
+            "density": { "type": "number", "minimum": 0, "maximum": 1 },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "density"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "humanize_timing" },
+            "amount": { "type": "number", "minimum": 0, "maximum": 1 },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "amount"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PerformanceIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "trigger_scene" },
+            "scene_name": { "type": "string" }
+          },
+          "required": ["action", "scene_name"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "trigger_clip" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "clip_name": { "type": "string" }
+          },
+          "required": ["action", "target", "clip_name"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TimbreAttribute": {
+      "type": "string",
+      "enum": [
+        "warmth",
+        "brightness",
+        "punch",
+        "width",
+        "distance",
+        "space",
+        "energy",
+        "tightness"
+      ]
+    },
+    "TimbreChange": {
+      "type": "object",
+      "properties": {
+        "attribute": { "$ref": "#/definitions/TimbreAttribute" },
+        "amount": { "type": "number", "minimum": -1, "maximum": 1 }
+      },
+      "required": ["attribute", "amount"],
+      "additionalProperties": false
+    },
+    "TimbreIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "adjust" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "attribute": { "$ref": "#/definitions/TimbreAttribute" },
+            "amount": { "type": "number", "minimum": -1, "maximum": 1 },
+            "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "adjectives": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["action", "attribute", "amount"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "adjust_many" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "changes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/TimbreChange" }
+            }
+          },
+          "required": ["action", "changes"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ParameterUnit": {
+      "type": "string",
+      "enum": ["db", "hz", "ms", "%"]
+    },
+    "ParametersTarget": {
+      "type": "object",
+      "properties": {
+        "role": { "$ref": "#/definitions/Role" },
+        "role_detail": { "type": "string" },
+        "track_name": { "type": "string" },
+        "track_id": { "type": "string" },
+        "index": { "type": "integer", "minimum": 0 },
+        "device_name": { "type": "string" },
+        "device_index": { "type": "integer", "minimum": 0 },
+        "parameter_name": { "type": "string" },
+        "parameter_index": { "type": "integer", "minimum": 0 }
+      },
+      "anyOf": [
+        { "required": ["parameter_name"] },
+        { "required": ["parameter_index"] }
+      ],
+      "additionalProperties": false
+    },
+    "ParametersIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "increase" },
+            "target": { "$ref": "#/definitions/ParametersTarget" },
+            "amount": { "type": "number" },
+            "unit": { "$ref": "#/definitions/ParameterUnit" }
+          },
+          "required": ["action", "target", "amount"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "decrease" },
+            "target": { "$ref": "#/definitions/ParametersTarget" },
+            "amount": { "type": "number" },
+            "unit": { "$ref": "#/definitions/ParameterUnit" }
+          },
+          "required": ["action", "target", "amount"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set" },
+            "target": { "$ref": "#/definitions/ParametersTarget" },
+            "amount": { "type": "number" },
+            "unit": { "$ref": "#/definitions/ParameterUnit" }
+          },
+          "required": ["action", "target", "amount"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ParameterSeriesIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_value" },
+            "value": { "oneOf": [{ "type": "string" }, { "type": "number" }] },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "value"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "set_series" },
+            "series": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "oneOf": [{ "type": "string" }, { "type": "number" }] }
+            },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "series"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "transform_series" },
+            "operation": {
+              "type": "string",
+              "enum": ["invert", "retrograde", "rotate", "shuffle", "stretch", "compress"]
+            },
+            "amount": { "type": "number" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "operation"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "map" },
+            "source": { "type": "string" },
+            "destination": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "source", "destination"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PitchIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "DurationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "DynamicsIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "ArticulationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "InstrumentationIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "TimePointIntent": { "$ref": "#/definitions/ParameterSeriesIntent" },
+    "AnalysisIntent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "summarize" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "detail": { "type": "string", "enum": ["brief", "detailed"] }
+          },
+          "required": ["action"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "describe" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "focus": { "type": "string" }
+          },
+          "required": ["action"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "query" },
+            "question": { "type": "string" },
+            "target": { "$ref": "#/definitions/TargetRef" },
+            "format": { "type": "string", "enum": ["text", "json"] }
+          },
+          "required": ["action", "question"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": { "const": "list" },
+            "kind": {
+              "type": "string",
+              "enum": ["tracks", "clips", "scenes", "devices", "notes", "automation"]
+            },
+            "target": { "$ref": "#/definitions/TargetRef" }
+          },
+          "required": ["action", "kind"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Intent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "transport" },
+            "intent": { "$ref": "#/definitions/TransportIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "structure" },
+            "intent": { "$ref": "#/definitions/StructureIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "music" },
+            "intent": { "$ref": "#/definitions/MusicIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "harmony" },
+            "intent": { "$ref": "#/definitions/HarmonyIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "rhythm" },
+            "intent": { "$ref": "#/definitions/RhythmIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "performance" },
+            "intent": { "$ref": "#/definitions/PerformanceIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "analysis" },
+            "intent": { "$ref": "#/definitions/AnalysisIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "pitch" },
+            "intent": { "$ref": "#/definitions/PitchIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "duration" },
+            "intent": { "$ref": "#/definitions/DurationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "dynamics" },
+            "intent": { "$ref": "#/definitions/DynamicsIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "articulation" },
+            "intent": { "$ref": "#/definitions/ArticulationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "instrumentation" },
+            "intent": { "$ref": "#/definitions/InstrumentationIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "time_point" },
+            "intent": { "$ref": "#/definitions/TimePointIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "timbre" },
+            "intent": { "$ref": "#/definitions/TimbreIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "domain": { "const": "parameters" },
+            "intent": { "$ref": "#/definitions/ParametersIntent" }
+          },
+          "required": ["domain", "intent"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Envelope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "transport" },
+            "intent": { "$ref": "#/definitions/TransportIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "structure" },
+            "intent": { "$ref": "#/definitions/StructureIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "music" },
+            "intent": { "$ref": "#/definitions/MusicIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "harmony" },
+            "intent": { "$ref": "#/definitions/HarmonyIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "rhythm" },
+            "intent": { "$ref": "#/definitions/RhythmIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "performance" },
+            "intent": { "$ref": "#/definitions/PerformanceIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "analysis" },
+            "intent": { "$ref": "#/definitions/AnalysisIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "pitch" },
+            "intent": { "$ref": "#/definitions/PitchIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "duration" },
+            "intent": { "$ref": "#/definitions/DurationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "dynamics" },
+            "intent": { "$ref": "#/definitions/DynamicsIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "articulation" },
+            "intent": { "$ref": "#/definitions/ArticulationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "instrumentation" },
+            "intent": { "$ref": "#/definitions/InstrumentationIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "time_point" },
+            "intent": { "$ref": "#/definitions/TimePointIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "timbre" },
+            "intent": { "$ref": "#/definitions/TimbreIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "version": { "$ref": "#/definitions/Version" },
+            "id": { "type": "string" },
+            "timestamp": { "type": "number" },
+            "source": { "$ref": "#/definitions/Source" },
+            "domain": { "const": "parameters" },
+            "intent": { "$ref": "#/definitions/ParametersIntent" }
+          },
+          "required": ["version", "id", "timestamp", "source", "domain", "intent"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

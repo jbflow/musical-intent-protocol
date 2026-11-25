@@ -10,9 +10,11 @@ MIP is the canonical, versioned specification for expressing **musical intent** 
 
 ## Versioning
 
-This repo starts at **v0.2**. New versions will be added in versioned folders under src.
+New versions are added in versioned folders under src (`src/v0_2`, `src/v0_3`). The package root and `./v0_3` export the latest version; `./v0_2` remains available as a versioned export.
 
-## Domains (v0.2)
+**v0.3 adds the parameters domain.**
+
+## Domains (v0.3)
 
 - **transport**: play/stop/record/locate/tempo/time signature/loop/metronome
 - **structure**: create/select/arm/mute/solo/load device/rename/duplicate/remove
@@ -28,6 +30,7 @@ This repo starts at **v0.2**. New versions will be added in versioned folders un
 - **instrumentation**: parameter series for instrument/voice assignment
 - **time_point**: parameter series for time-point systems
 - **timbre**: perceptual adjectives (warmth, brightness, punch, width, distance, space, energy, tightness)
+- **parameters** (v0.3 only): explicit device-parameter control (increase/decrease/set a named parameter on a named device)
 
 ## Roles
 
@@ -45,7 +48,7 @@ A common envelope is recommended for engine use:
 
 ```json
 {
-  "version": "0.2",
+  "version": "0.3",
   "id": "uuid",
   "timestamp": 1739579325000,
   "source": "ui",
@@ -101,6 +104,26 @@ Multi-attribute edit:
 }
 ```
 
+## Parameters (Explicit Device Control)
+
+Parameters intents address a specific parameter on a specific device and carry a numeric `amount` with an optional `unit` (`db`, `hz`, `ms`, `%`). `increase` and `decrease` apply `amount` as a relative change; `set` applies it as an absolute value.
+
+```json
+{
+  "domain": "parameters",
+  "intent": {
+    "action": "increase",
+    "target": { "role": "bass", "device_name": "Compressor", "parameter_name": "Attack" },
+    "amount": 5,
+    "unit": "ms"
+  }
+}
+```
+
+The `target` combines track selection (`role`/`role_detail`/`track_name`/`track_id`/`index`), device selection (`device_name`/`device_index`) and parameter selection (`parameter_name`/`parameter_index`); at least one parameter selector is required.
+
+**Parameters vs. timbre:** `parameters` is *explicit* device control: you name the device and parameter and the value to apply, so the intent is tied to what is loaded on the track. `timbre` is *perceptual*: you say “warmer” or “wider” and the interpreter decides which devices and parameters to move. Prefer `timbre` for host-agnostic intent and use `parameters` only when the exact control matters. This is also why the parameters target may include names and indices that other domains avoid.
+
 ## Harmony (12-TET)
 
 Harmony intents express 12-TET structure (keys, scales, chords, and progressions):
@@ -133,9 +156,9 @@ Rhythm intents describe groove and timing behavior:
 
 ## TypeScript + Zod
 
-- Types in src/v0_1/mip.ts
-- Zod validators in src/v0_1/zod.ts
-- JSON Schema in schema/mip-0.1.schema.json
+- Types in src/v0_3/mip.ts
+- Zod validators in src/v0_3/zod.ts
+- JSON Schema in schema/mip-0.3.schema.json (earlier versions: src/v0_2, schema/mip-0.2.schema.json)
 
 ## Helpers
 
@@ -146,7 +169,7 @@ Rhythm intents describe groove and timing behavior:
 
 ## Examples
 
-See the examples folder for JSON files that validate against v0.2.
+See the examples folder for JSON files that validate against v0.3.
 
 ## Build
 

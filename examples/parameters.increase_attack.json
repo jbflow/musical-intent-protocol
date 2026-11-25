@@ -1,0 +1,9 @@
+{
+  "domain": "parameters",
+  "intent": {
+    "action": "increase",
+    "target": { "role": "bass", "device_name": "Compressor", "parameter_name": "Attack" },
+    "amount": 5,
+    "unit": "ms"
+  }
+}

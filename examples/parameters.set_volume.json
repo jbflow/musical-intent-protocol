@@ -1,0 +1,9 @@
+{
+  "domain": "parameters",
+  "intent": {
+    "action": "set",
+    "target": { "track_name": "Lead Vocal", "parameter_name": "Volume" },
+    "amount": -6,
+    "unit": "db"
+  }
+}

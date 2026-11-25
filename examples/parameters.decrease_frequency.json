@@ -1,0 +1,9 @@
+{
+  "domain": "parameters",
+  "intent": {
+    "action": "decrease",
+    "target": { "role": "pad", "device_name": "EQ Eight", "parameter_name": "Frequency" },
+    "amount": 200,
+    "unit": "hz"
+  }
+}

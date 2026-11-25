@@ -145,7 +145,7 @@ describe("MIP schema action coverage", () => {
       });
 
       expect(envelope.id).toMatch(/^mip_/);
-      expect(envelope.version).toBe("0.2");
+      expect(envelope.version).toBe("0.3");
       expect(typeof envelope.timestamp).toBe("number");
     } finally {
       if (cryptoDescriptor) {

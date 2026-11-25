@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { IntentOrArraySchema } from "../src/v0_1/zod";
+import { IntentOrArraySchema } from "../src/v0_3/zod";
 
 describe("example validation", () => {
   const examplesDir = path.join(process.cwd(), "examples");

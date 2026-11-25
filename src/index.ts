@@ -1,6 +1,6 @@
-export * from "./v0_1/mip";
-export * from "./v0_1/zod";
-export * from "./v0_1/schema";
-export * from "./v0_1/examples";
+export * from "./v0_3/mip";
+export * from "./v0_3/zod";
+export * from "./v0_3/schema";
+export * from "./v0_3/examples";
 
-export const latestVersion = "0.2" as const;
+export const latestVersion = "0.3" as const;
