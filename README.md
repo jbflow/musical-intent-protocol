@@ -1,12 +1,13 @@
 # Musical Intent Protocol (MIP)
 
-MIP is the canonical, versioned specification for expressing **musical intent** in a DAW-agnostic way. It sits above MIDI/OSC and plugin parameters, describing *what you want* rather than *how a specific host achieves it*.
+MIP is a canonical, versioned specification for expressing **musical intent** through a new, host-agnostic musical language. Alongside established musical communication protocols such as MIDI and OSC, MIP introduces a way to express *what you want to do musically*, rather than the specific messages or parameters used to achieve it. It provides a shared, structured language for describing musical actions, independent of any particular DAW, instrument or platform.
 
 ## Why MIP
 
-- **Host-agnostic**: no DAW IDs, no plugin parameters, no track indices.
-- **Intent-first**: semantic actions like “quantize the drums” or “make the bass warmer”.
-- **Perceptual timbre layer**: continuous, human-adjective controls (warmth, width, tightness).
+- **Host-agnostic**: a consistent musical language that can be interpreted across different DAWs, instruments and environments.
+- **Intent-first**: expresses musical actions and goals, from direct operations to higher-level requests like “quantize the drums” or “make the bass warmer”.
+- **Expressive and precise**: supports both semantic musical concepts and concrete instructions, including track references, plugin parameters and values.
+- **Perceptual timbre layer**: introduces continuous, human-readable controls for qualities such as warmth, width and tightness.
 
 ## Versioning
 
